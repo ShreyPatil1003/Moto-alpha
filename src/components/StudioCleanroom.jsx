@@ -1,5 +1,6 @@
 import React from 'react';
-import { Shield, Sparkles, Sun, Cpu, CheckCircle2, MapPin, Navigation, ExternalLink } from 'lucide-react';
+import { MapPin, Navigation, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function StudioCleanroom() {
   const highlights = [
@@ -24,11 +25,17 @@ export default function StudioCleanroom() {
   ];
 
   return (
-    <section id="studio" className="section-padding" style={{ backgroundColor: 'var(--surface-soft)', borderTop: '1px solid var(--hairline-strong)' }}>
+    <section id="studio" className="section-padding" style={{ backgroundColor: 'var(--surface-soft)', borderTop: '1px solid var(--hairline-strong)', position: 'relative', overflow: 'hidden' }}>
       <div className="container-wide">
         
-        {/* Header */}
-        <div style={{ marginBottom: '48px' }}>
+        {/* Header with Scroll Fade */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          style={{ marginBottom: '48px' }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <div className="m-stripe-badge" />
             <span className="label-uppercase" style={{ fontSize: '13px', color: 'var(--muted)' }}>
@@ -44,26 +51,39 @@ export default function StudioCleanroom() {
               Our studio environment was purpose-built to eliminate environmental variables that compromise ceramic adhesion and film clarity.
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        {/* 3-Up Feature Cards Grid */}
+        {/* 3-Up Feature Cards Grid with Staggered Scroll Animation */}
         <div className="grid-3up">
           {highlights.map((item, index) => (
-            <div
+            <motion.div
               key={index}
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.6, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{
+                y: -8,
+                borderColor: 'var(--m-blue-light)',
+                boxShadow: '0 20px 45px rgba(0,0,0,0.85)',
+                transition: { duration: 0.25 }
+              }}
               className="card-surface"
               style={{
                 padding: 0,
                 backgroundColor: 'var(--canvas)',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease'
               }}
             >
-              {/* Photo Band */}
+              {/* Photo Band with Zoom Transition */}
               <div style={{ position: 'relative', height: '240px', overflow: 'hidden' }}>
-                <img
+                <motion.img
                   src={item.image}
                   alt={item.title}
+                  whileHover={{ scale: 1.08 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -78,7 +98,8 @@ export default function StudioCleanroom() {
                     left: '16px',
                     backgroundColor: 'rgba(0,0,0,0.85)',
                     border: '1px solid var(--hairline)',
-                    padding: '4px 12px'
+                    padding: '4px 12px',
+                    backdropFilter: 'blur(4px)'
                   }}
                 >
                   <span className="label-uppercase" style={{ fontSize: '11px', color: 'var(--primary)' }}>
@@ -101,12 +122,17 @@ export default function StudioCleanroom() {
                   {item.subtitle}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Studio Location Band */}
-        <div
+        {/* Studio Location Band with Scroll Fade & Hover Elevation */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.7 }}
+          whileHover={{ borderColor: 'var(--m-red)', boxShadow: '0 12px 35px rgba(226, 39, 24, 0.2)' }}
           style={{
             marginTop: '48px',
             backgroundColor: 'var(--canvas)',
@@ -116,11 +142,14 @@ export default function StudioCleanroom() {
             flexWrap: 'wrap',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '24px'
+            gap: '24px',
+            transition: 'border-color 0.3s ease, box-shadow 0.3s ease'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', maxWidth: '680px' }}>
-            <div
+            <motion.div
+              whileHover={{ rotate: 12, scale: 1.1 }}
+              transition={{ type: 'spring', stiffness: 300 }}
               style={{
                 width: '48px',
                 height: '48px',
@@ -134,7 +163,7 @@ export default function StudioCleanroom() {
               }}
             >
               <MapPin size={24} />
-            </div>
+            </motion.div>
             <div>
               <div className="label-uppercase" style={{ fontSize: '11px', color: 'var(--m-red)', marginBottom: '4px' }}>
                 VISIT OUR DETAILING STUDIO
@@ -148,16 +177,18 @@ export default function StudioCleanroom() {
             </div>
           </div>
 
-          <a
+          <motion.a
             href="https://www.google.com/maps/dir/?api=1&destination=19.1812343,73.2188796"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary"
+            whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(28, 105, 212, 0.4)' }}
+            whileTap={{ scale: 0.96 }}
             style={{ textDecoration: 'none' }}
           >
             <Navigation size={16} /> NAVIGATE TO MOTO-ALPHA <ExternalLink size={16} />
-          </a>
-        </div>
+          </motion.a>
+        </motion.div>
 
       </div>
     </section>

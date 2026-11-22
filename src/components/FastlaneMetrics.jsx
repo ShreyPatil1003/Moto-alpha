@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShieldCheck, Zap, Gauge, Flame, Clock, Award } from 'lucide-react';
+import { ShieldCheck, Zap, Gauge, Award } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function FastlaneMetrics() {
   const metrics = [
@@ -33,6 +34,30 @@ export default function FastlaneMetrics() {
     }
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.12,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 35, scale: 0.98 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
   return (
     <section
       style={{
@@ -40,11 +65,20 @@ export default function FastlaneMetrics() {
         borderTop: '1px solid var(--hairline-strong)',
         borderBottom: '1px solid var(--hairline-strong)',
         paddingTop: '64px',
-        paddingBottom: '64px'
+        paddingBottom: '64px',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
       <div className="container-wide">
-        <div style={{ marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Header with Scroll Fade */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          style={{ marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}
+        >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <div className="m-stripe-badge" />
@@ -57,17 +91,40 @@ export default function FastlaneMetrics() {
           <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', letterSpacing: '2px', color: 'var(--muted)' }}>
             STUDIO VERIFIED // 2026
           </span>
-        </div>
+        </motion.div>
 
-        {/* 4-Up Spec Cell Grid */}
-        <div className="grid-4up">
+        {/* 4-Up Spec Cell Grid with Scroll-Triggered Stagger */}
+        <motion.div
+          className="grid-4up"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+        >
           {metrics.map((m, index) => {
             const Icon = m.icon;
             return (
-              <div key={index} className="spec-cell" style={{ minHeight: '220px' }}>
+              <motion.div
+                key={index}
+                variants={cardVariants}
+                whileHover={{
+                  y: -8,
+                  borderColor: m.color,
+                  boxShadow: '0 14px 35px rgba(0, 0, 0, 0.7)',
+                  transition: { duration: 0.25 }
+                }}
+                className="spec-cell"
+                style={{
+                  minHeight: '220px',
+                  transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                  cursor: 'default'
+                }}
+              >
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <Icon size={24} style={{ color: m.color }} />
+                    <motion.div whileHover={{ rotate: 10, scale: 1.1 }} transition={{ type: 'spring', stiffness: 300 }}>
+                      <Icon size={24} style={{ color: m.color }} />
+                    </motion.div>
                     <span style={{ fontFamily: 'var(--font-display)', fontSize: '12px', color: 'var(--hairline)' }}>
                       0{index + 1}
                     </span>
@@ -83,10 +140,10 @@ export default function FastlaneMetrics() {
                 <p style={{ fontSize: '13px', color: 'var(--body)', margin: '16px 0 0 0', lineHeight: 1.5 }}>
                   {m.detail}
                 </p>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

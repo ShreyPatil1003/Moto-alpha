@@ -7,10 +7,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build outputs
 node_modules
 dist
 dist-ssr
 *.local
+
+# Environment variables & Confidential secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.cert
+
+# Confidential Database Schemas & Migrations
+supabase/
+
+# AI Agent & Internal Tool Configurations
+.agents/
+.mcp.json
+skills-lock.json
 
 # Editor directories and files
 .vscode/*

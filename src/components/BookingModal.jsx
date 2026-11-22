@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Car, CheckCircle2, Shield, ArrowRight, MapPin, ArrowUpRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, CheckCircle2, ArrowRight, MapPin, ArrowUpRight, Lock, User } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { createBooking } from '../lib/supabase';
 
-export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
+export default function BookingModal({ isOpen, onClose, prefilledConfig, user, onOpenAuth }) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -17,6 +19,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
   const [submitted, setSubmitted] = useState(false);
   const [bookingId, setBookingId] = useState('');
 
+  // Prefill configuration if user came from configurator
   useEffect(() => {
     if (prefilledConfig) {
       setFormData(prev => ({
@@ -28,13 +31,53 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
     }
   }, [prefilledConfig]);
 
+  // Auto-populate authenticated user information
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || user.username || user.user_metadata?.username || user.user_metadata?.full_name || '',
+        phone: prev.phone || user.phone || '',
+        email: prev.email || user.email || ''
+      }));
+    }
+  }, [user]);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Enforce authentication gate
+    if (!user) {
+      if (onOpenAuth) {
+        onClose();
+        onOpenAuth();
+      }
+      return;
+    }
+
     const randomId = 'MOTO-' + Math.floor(100000 + Math.random() * 900000);
     setBookingId(randomId);
     setSubmitted(true);
+
+    // Persist to Supabase
+    try {
+      await createBooking({
+        booking_ref: randomId,
+        user_id: user?.id || null,
+        customer_name: formData.name,
+        customer_phone: formData.phone,
+        customer_email: formData.email,
+        vehicle_model: formData.vehicle,
+        service_specification: formData.service,
+        preferred_date: formData.date,
+        preferred_time: formData.time,
+        notes: formData.notes
+      });
+    } catch (err) {
+      console.warn('Booking sync notice:', err);
+    }
 
     // Trigger celebration confetti
     try {
@@ -44,7 +87,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
         origin: { y: 0.6 },
         colors: ['#0066b1', '#1c69d4', '#e22718', '#ffffff']
       });
-    } catch (err) {
+    } catch {
       // fallback silent
     }
   };
@@ -72,7 +115,10 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
       }}
       onClick={(e) => e.target === e.currentTarget && resetAndClose()}
     >
-      <div
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 15 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
         className="card-surface"
         style={{
           width: '100%',
@@ -110,7 +156,62 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
 
         {/* Form Body or Success State */}
         <div style={{ padding: '32px' }}>
-          {submitted ? (
+          
+          {/* Authentication Gate: If not logged in, prompt user to login/signup */}
+          {!user ? (
+            <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+              <div
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  margin: '0 auto 20px auto',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(28, 105, 212, 0.15)',
+                  border: '1px solid var(--m-blue-dark)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--m-blue-light)'
+                }}
+              >
+                <Lock size={30} />
+              </div>
+
+              <div className="label-uppercase" style={{ fontSize: '12px', color: 'var(--m-blue-light)', marginBottom: '8px' }}>
+                CLIENT AUTHENTICATION REQUIRED
+              </div>
+
+              <h3 className="display-sm" style={{ fontSize: '26px', margin: '0 0 16px 0' }}>
+                LOGIN TO CONFIRM YOUR SLOT
+              </h3>
+
+              <p style={{ fontSize: '14px', color: 'var(--body)', maxWidth: '460px', margin: '0 auto 28px auto', lineHeight: 1.6 }}>
+                You can freely explore Moto-Alpha specs and facilities, but slot booking requires an authenticated profile with your username.
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    if (onOpenAuth) onOpenAuth();
+                  }}
+                  className="btn-primary"
+                  style={{ minWidth: '220px', justifyContent: 'center' }}
+                >
+                  <User size={16} /> LOGIN / SIGNUP TO BOOK
+                </button>
+                <button
+                  type="button"
+                  onClick={resetAndClose}
+                  className="btn-outline"
+                  style={{ minWidth: '140px', justifyContent: 'center' }}
+                >
+                  CONTINUE BROWSING
+                </button>
+              </div>
+            </div>
+          ) : submitted ? (
             <div style={{ textAlign: 'center', padding: '24px 0' }}>
               <div style={{ width: '64px', height: '64px', margin: '0 auto 24px auto', borderRadius: '50%', backgroundColor: 'var(--surface-card)', border: '2px solid var(--m-blue-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--m-blue-dark)' }}>
                 <CheckCircle2 size={36} />
@@ -188,7 +289,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 <div>
                   <label className="label-uppercase" style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', marginBottom: '6px' }}>
-                    FULL NAME *
+                    PILOT / FULL NAME *
                   </label>
                   <input
                     type="text"
@@ -207,7 +308,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
                   <input
                     type="tel"
                     required
-                    placeholder="+1 (555) 000-0000"
+                    placeholder="+91 98765 43210"
                     value={formData.phone}
                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
                     className="text-input"
@@ -224,7 +325,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
                   <input
                     type="email"
                     required
-                    placeholder="alexander@domain.com"
+                    placeholder="pilot@domain.com"
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                     className="text-input"
@@ -262,6 +363,15 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
                   <option value="STAGE 3 MIRROR GLOSS RESTORATION">STAGE 3 MIRROR GLOSS RESTORATION</option>
                   <option value="ALCANTARA & LEATHER RESTORATION">ALCANTARA & LEATHER RESTORATION</option>
                   <option value="CUSTOM DETAILING SPEC">CUSTOM SPECIFICATION (FROM CONFIGURATOR)</option>
+                  {formData.service && ![
+                    '9H GRAPHENE CERAMIC MATRIX',
+                    'STEALTH MATTE PPF WRAP',
+                    'STAGE 3 MIRROR GLOSS RESTORATION',
+                    'ALCANTARA & LEATHER RESTORATION',
+                    'CUSTOM DETAILING SPEC'
+                  ].includes(formData.service) && (
+                    <option value={formData.service}>{formData.service}</option>
+                  )}
                 </select>
               </div>
 
@@ -269,7 +379,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
                 <div>
                   <label className="label-uppercase" style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', marginBottom: '6px' }}>
-                    PREFERRED STUDIO DATE
+                    PREFERRED STUDIO DATE *
                   </label>
                   <input
                     type="date"
@@ -282,7 +392,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
 
                 <div>
                   <label className="label-uppercase" style={{ display: 'block', fontSize: '11px', color: 'var(--muted)', marginBottom: '6px' }}>
-                    DROP-OFF TIME SLOT
+                    DROP-OFF TIME SLOT *
                   </label>
                   <select
                     value={formData.time}
@@ -324,7 +434,7 @@ export default function BookingModal({ isOpen, onClose, prefilledConfig }) {
             </form>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

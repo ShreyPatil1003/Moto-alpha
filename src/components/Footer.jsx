@@ -1,5 +1,6 @@
 import React from 'react';
-import { Phone, Mail, MapPin, Clock, ArrowUpRight } from 'lucide-react';
+import { Phone, Mail, MapPin, ArrowUpRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Footer({ onOpenBooking }) {
   return (
@@ -9,13 +10,19 @@ export default function Footer({ onOpenBooking }) {
         borderTop: '1px solid var(--hairline)',
         paddingTop: '64px',
         paddingBottom: '40px',
-        color: 'var(--body)'
+        color: 'var(--body)',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
       <div className="container-wide">
 
-        {/* Pre-Footer CTA Band */}
-        <div
+        {/* Pre-Footer CTA Band with Scroll Fade */}
+        <motion.div
+          initial={{ opacity: 0, y: 35 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.7 }}
           style={{
             position: 'relative',
             backgroundColor: 'var(--surface-soft)',
@@ -52,14 +59,21 @@ export default function Footer({ onOpenBooking }) {
           </div>
 
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-            <button onClick={onOpenBooking} className="btn-primary">
+            <motion.button
+              onClick={onOpenBooking}
+              className="btn-primary"
+              whileHover={{ scale: 1.04, boxShadow: '0 0 20px rgba(28, 105, 212, 0.4)' }}
+              whileTap={{ scale: 0.96 }}
+            >
               RESERVE STUDIO BAY NOW
-            </button>
-            <a
+            </motion.button>
+            <motion.a
               href="https://www.google.com/maps/dir/?api=1&destination=19.1812343,73.2188796"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-outline"
+              whileHover={{ scale: 1.03, borderColor: 'var(--m-red)', boxShadow: '0 0 15px rgba(226, 39, 24, 0.3)' }}
+              whileTap={{ scale: 0.97 }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -71,15 +85,24 @@ export default function Footer({ onOpenBooking }) {
             >
               <MapPin size={16} style={{ color: 'var(--m-red)' }} />
               NAVIGATE TO MOTO-ALPHA
-            </a>
-            <a href="tel:+18005556686" className="btn-outline">
+            </motion.a>
+            <motion.a
+              href="tel:+18005556686"
+              className="btn-outline"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+            >
               CALL FASTLANE HOTLINE
-            </a>
+            </motion.a>
           </div>
-        </div>
+        </motion.div>
 
-        {/* 4-Column Links Layout */}
-        <div
+        {/* 4-Column Links Layout with Staggered Scroll Animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.6 }}
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -110,11 +133,13 @@ export default function Footer({ onOpenBooking }) {
                 <span>Shop No. 2, Shreeji Landmark, Next to Tata Showroom, Opposite to Carmel Convent School, Chikhloli, Ambernath(East)</span>
               </div>
               <div>
-                <a
+                <motion.a
                   href="https://www.google.com/maps/dir/?api=1&destination=19.1812343,73.2188796"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-outline"
+                  whileHover={{ scale: 1.02, borderColor: 'var(--m-red)' }}
+                  whileTap={{ scale: 0.98 }}
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -129,7 +154,7 @@ export default function Footer({ onOpenBooking }) {
                 >
                   <MapPin size={14} style={{ color: 'var(--m-red)' }} />
                   NAVIGATE TO MOTO-ALPHA <ArrowUpRight size={14} />
-                </a>
+                </motion.a>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--body-strong)', marginTop: '4px' }}>
                 <Phone size={14} style={{ color: 'var(--m-blue-dark)' }} />
@@ -148,11 +173,11 @@ export default function Footer({ onOpenBooking }) {
               PROTECTION SERVICES
             </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
-              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none' }}>Self-Healing PPF Stealth Wrap</a></li>
-              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none' }}>9H Graphene Ceramic Matrix</a></li>
-              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none' }}>Stage 3 Dual-Action Paint Restoration</a></li>
-              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none' }}>Alcantara & Suede Cockpit Renewal</a></li>
-              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none' }}>Ceramic Wheel & Caliper Protection</a></li>
+              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Self-Healing PPF Stealth Wrap</a></li>
+              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>9H Graphene Ceramic Matrix</a></li>
+              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Stage 3 Dual-Action Paint Restoration</a></li>
+              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Alcantara & Suede Cockpit Renewal</a></li>
+              <li><a href="#services" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Ceramic Wheel & Caliper Protection</a></li>
             </ul>
           </div>
 
@@ -162,11 +187,10 @@ export default function Footer({ onOpenBooking }) {
               FACILITY STANDARDS
             </div>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
-              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none' }}>ISO Class 7 Clean Rooms</a></li>
-              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none' }}>Scangrip 96+ CRI Solar Lighting</a></li>
-              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none' }}>Infrared Shortwave Polymer Curing</a></li>
-              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none' }}>Ultrasonic Digital Paint Thickness Gauges</a></li>
-              <li><a href="#visualizer" style={{ color: 'var(--body)', textDecoration: 'none' }}>Interactive Optical Visualizer</a></li>
+              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>ISO Class 7 Clean Rooms</a></li>
+              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Scangrip 96+ CRI Solar Lighting</a></li>
+              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Infrared Shortwave Polymer Curing</a></li>
+              <li><a href="#studio" style={{ color: 'var(--body)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--body)'}>Ultrasonic Digital Paint Thickness Gauges</a></li>
             </ul>
           </div>
 
@@ -190,7 +214,7 @@ export default function Footer({ onOpenBooking }) {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Bottom Bar with BMW M Style Caption Disclaimer */}
         <div
@@ -210,9 +234,9 @@ export default function Footer({ onOpenBooking }) {
             © 2026 MOTO-ALPHA DETAILING STUDIO. ALL RIGHTS RESERVED. DESIGNED ACCORDING TO BMW M MOTORSPORT STANDARDS.
           </div>
           <div style={{ display: 'flex', gap: '24px' }}>
-            <a href="#" style={{ color: 'var(--muted)', textDecoration: 'none' }}>PRIVACY POLICY</a>
-            <a href="#" style={{ color: 'var(--muted)', textDecoration: 'none' }}>TERMS OF SPECIFICATION</a>
-            <a href="#" style={{ color: 'var(--muted)', textDecoration: 'none' }}>WARRANTY PORTAL</a>
+            <a href="#" style={{ color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--muted)'}>PRIVACY POLICY</a>
+            <a href="#" style={{ color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--muted)'}>TERMS OF SPECIFICATION</a>
+            <a href="#" style={{ color: 'var(--muted)', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = 'var(--muted)'}>WARRANTY PORTAL</a>
           </div>
         </div>
 

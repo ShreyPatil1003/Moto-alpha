@@ -1,8 +1,9 @@
 import React from 'react';
-import { Star, ShieldCheck, Award, Quote } from 'lucide-react';
+import { Star, Quote, MessageSquarePlus } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-export default function Testimonials() {
-  const reviews = [
+export default function Testimonials({ reviews = [], onOpenReview }) {
+  const defaultReviews = [
     {
       name: "MAXIMILIAN V.",
       vehicle: "2025 BMW M4 COMPETITION xDRIVE",
@@ -32,12 +33,34 @@ export default function Testimonials() {
     }
   ];
 
+  const displayReviews = reviews && reviews.length > 0 ? reviews : defaultReviews;
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 35, scale: 0.98 },
+    visible: (index) => ({
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        delay: index * 0.15,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    })
+  };
+
   return (
-    <section id="reviews" className="section-padding" style={{ backgroundColor: 'var(--canvas)' }}>
+    <section id="reviews" className="section-padding" style={{ backgroundColor: 'var(--canvas)', overflow: 'hidden' }}>
       <div className="container-wide">
         
-        {/* Header */}
-        <div style={{ marginBottom: '48px' }}>
+        {/* Header with Scroll Fade */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.6 }}
+          style={{ marginBottom: '48px' }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
             <div className="m-stripe-badge" />
             <span className="label-uppercase" style={{ fontSize: '13px', color: 'var(--muted)' }}>
@@ -46,26 +69,75 @@ export default function Testimonials() {
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', gap: '24px' }}>
-            <h2 className="display-lg" style={{ margin: 0, maxWidth: '650px' }}>
-              VERIFIED OWNER EXPERIENCES
-            </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ display: 'flex', color: 'var(--m-red)' }}>
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={18} fill="var(--m-red)" />
-                ))}
+            <div>
+              <h2 className="display-lg" style={{ margin: 0, maxWidth: '650px' }}>
+                VERIFIED OWNER EXPERIENCES
+              </h2>
+              <p style={{ marginTop: '8px', fontSize: '15px', color: 'var(--body)' }}>
+                Direct telemetry metrics, optical clarity feedback, and verified studio build logs.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ display: 'flex', color: 'var(--m-red)' }}>
+                  {[...Array(5)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.2 + i * 0.08, type: 'spring', stiffness: 400 }}
+                    >
+                      <Star size={18} fill="var(--m-red)" />
+                    </motion.div>
+                  ))}
+                </div>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 700, color: 'var(--primary)' }}>
+                  5.0 / 5.0 RATING ({displayReviews.length > 3 ? `${displayReviews.length * 60}+` : '180+'} PLATFORMS)
+                </span>
               </div>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 700, color: 'var(--primary)' }}>
-                5.0 / 5.0 RATING (180+ SUPERCAR PLATFORMS)
-              </span>
+
+              {onOpenReview && (
+                <motion.button
+                  type="button"
+                  onClick={onOpenReview}
+                  className="btn-outline"
+                  whileHover={{ scale: 1.04, borderColor: 'var(--m-blue-light)' }}
+                  whileTap={{ scale: 0.96 }}
+                  style={{ height: '44px', padding: '0 20px', gap: '8px', fontSize: '12px' }}
+                >
+                  <MessageSquarePlus size={16} /> LEAVE A REVIEW
+                </motion.button>
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* 3-Up Reviews Grid */}
+        {/* 3-Up Reviews Grid with Staggered Scroll Animation */}
         <div className="grid-3up">
-          {reviews.map((r, index) => (
-            <div key={index} className="card-surface" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          {displayReviews.map((r, index) => (
+            <motion.div
+              key={index}
+              custom={index}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-40px' }}
+              whileHover={{
+                y: -8,
+                borderColor: 'var(--m-blue-dark)',
+                boxShadow: '0 20px 45px rgba(0, 0, 0, 0.85)',
+                transition: { duration: 0.25 }
+              }}
+              className="card-surface"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease'
+              }}
+            >
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                   <div className="label-uppercase" style={{ fontSize: '11px', color: 'var(--m-blue-dark)' }}>
@@ -84,8 +156,15 @@ export default function Testimonials() {
               </div>
 
               <div style={{ borderTop: '1px solid var(--hairline-strong)', paddingTop: '16px', marginTop: '16px' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 700, color: 'var(--primary)' }}>
-                  {r.name}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 700, color: 'var(--primary)' }}>
+                    {r.name}
+                  </div>
+                  <div style={{ display: 'flex', color: 'var(--m-red)' }}>
+                    {[...Array(r.rating || 5)].map((_, i) => (
+                      <Star key={i} size={12} fill="var(--m-red)" />
+                    ))}
+                  </div>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--m-blue-light)', fontWeight: 600, marginTop: '2px' }}>
                   {r.vehicle}
@@ -94,7 +173,7 @@ export default function Testimonials() {
                   {r.service}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
